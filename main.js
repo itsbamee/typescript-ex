@@ -30,12 +30,12 @@ function addListItem(task) {
 
 	checkbox.addEventListener('change', () => {
 		task.complete = checkbox.checked;
-		console.log(tasks);
+		task.complete ? (item.style.textDecoration = 'line-through') : (item.style.textDecoration = 'none');
+		saveTasks();
 	});
 
 	item.append(checkbox, task.title);
 	list.append(item);
-	saveTasks();
 }
 
 function saveTasks() {

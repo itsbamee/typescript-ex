@@ -1,8 +1,11 @@
 const list = document.querySelector('#list');
 const form = document.querySelector('#form');
 const input = document.querySelector('#title');
-let data = localStorage.getItem('TASKS') || [];
-let tasks = JSON.parse(data);
+let data = localStorage.getItem('TASKS');
+
+//기존처럼 로컬저장소 값이 없을 때 대체값으로 빈 배열을 처리하면
+//아래 구분에 배열.parse(data)가 오류구문이므로 아래쪽에 삼항연산자 처리
+let tasks = data ? JSON.parse(data) : [];
 
 tasks.forEach(task => addListItem(task));
 

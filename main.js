@@ -1,7 +1,10 @@
 const list = document.querySelector('#list');
 const form = document.querySelector('#form');
 const input = document.querySelector('#title');
-const tasks = [];
+let data = localStorage.getItem('TASKS') || [];
+let tasks = JSON.parse(data);
+
+tasks.forEach(task => addListItem(task));
 
 form.addEventListener('submit', e => {
 	e.preventDefault();
@@ -14,7 +17,6 @@ form.addEventListener('submit', e => {
 		complete: false
 	};
 
-	//할 일 목록을 tasks라는 배열에 추가
 	tasks.push(newTask);
 
 	input.value = '';
@@ -26,8 +28,6 @@ function addListItem(task) {
 	const checkbox = document.createElement('input');
 	checkbox.type = 'checkbox';
 
-	//동적으로 생성되는 체크박스에 변경점이 생길 때 complete에 boolean값이 담기도록 이벤트 핸들러 미리 연결
-
 	checkbox.addEventListener('change', () => {
 		task.complete = checkbox.checked;
 		console.log(tasks);
@@ -35,4 +35,9 @@ function addListItem(task) {
 
 	item.append(checkbox, task.title);
 	list.append(item);
+	saveTasks();
+}
+
+function saveTasks() {
+	localStorage.setItem('TASKS', JSON.stringify(tasks));
 }

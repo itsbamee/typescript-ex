@@ -1,78 +1,54 @@
 const list = document.querySelector('#list');
 const form = document.querySelector('#form');
 const input = document.querySelector('#title');
-let data = localStorage.getItem('TASKS');
-
-let tasks = data ? JSON.parse(data) : [];
-
+//JSON.parse 메서드는 무조건 파라미터 값으로 문자값만 들어오도록 강제되어 있음
+//처음 로컬저장소의 값이 없을 때에는 빈배열을 문자화해서 대체처리
+//Task 방식의 배열타입을 tasks에 지정
+let tasks = JSON.parse(localStorage.getItem('TASKS') || '[]');
 tasks.forEach(task => addListItem(task));
-
-form.addEventListener('submit', e => {
-	e.preventDefault();
-	if (input.value.trim() === '') return alert('할일을 입력하세요.');
-	const newTask = {
-		id: performance.now(),
-		title: input.value,
-		createAt: new Date(),
-		complete: false
-	};
-
-	tasks.push(newTask);
-	addListItem(newTask);
-	saveTasks();
-
-	input.value = '';
-});
-
 function addListItem(task) {
-	const item = document.createElement('li');
-	const checkbox = document.createElement('input');
-	checkbox.type = 'checkbox';
-	const button = document.createElement('button');
-	button.innerText = '삭제';
-
-	if (task.complete) {
-		item.style.textDecoration = 'line-through';
-		checkbox.checked = true;
-		item.append(button);
-	} else {
-		item.style.textDecoration = 'none';
-		checkbox.checked = false;
-	}
-
-	checkbox.addEventListener('change', () => {
-		task.complete = checkbox.checked;
-		//순서1 - task 객체의 complete가 true면 동적으로 삭제버튼 생성
-		//체크박스를 체크할 때 마다도 삭제버튼을 동적으로 생성
-		if (task.complete) {
-			item.style.textDecoration = 'line-through';
-			const button = document.createElement('button');
-			button.innerText = '삭제';
-			item.append(button);
-
-			//삭제버튼이 동적으로 생성되는 시점이 해당 코드블록 안이기 때문에
-			//가상의 이벤트를 연결하기 위해서는 해당 코드블록 안쪽에 이벤트문을 생성해 주어야 함
-			button.addEventListener('click', e => {
-				//동적으로 클릭한 삭제버튼의 해당하는 객체의 id값을 가져와서
-				const del_id = task.id;
-				//모든 배열값을 반복돌면서 해당 id값과 같지 않은 나머지 배열값만 리턴 (결과적으로 id값이 동일한 객체만 삭제됨)
-				tasks = tasks.filter(el => el.id !== del_id);
-				//변경된 배열값으로 로컬저장소 저장
-				saveTasks();
-				//브라우저상에서도 해당 li 요소를 강제 제거
-				e.currentTarget.closest('li').remove();
-			});
-		} else {
-			item.style.textDecoration = 'none';
-			item.querySelector('button').remove();
-		}
-		saveTasks();
-	});
-
-	item.prepend(checkbox, task.title);
-	list.append(item);
+    const item = document.createElement('li');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    const button = document.createElement('button');
+    button.innerText = '삭제';
+    if (task.complete) {
+        item.style.textDecoration = 'line-through';
+        checkbox.checked = true;
+        item.append(button);
+    }
+    else {
+        item.style.textDecoration = 'none';
+        checkbox.checked = false;
+    }
+    checkbox.addEventListener('change', () => {
+        var _a;
+        task.complete = checkbox.checked;
+        if (task.complete) {
+            item.style.textDecoration = 'line-through';
+            const button = document.createElement('button');
+            button.innerText = '삭제';
+            item.append(button);
+            button.addEventListener('click', (e) => {
+                var _a;
+                const del_id = task.id;
+                tasks = tasks.filter(el => el.id !== del_id);
+                saveTasks();
+                //타입스크립트에서는 event객체 안쪽의 property를 읽지 못하는 버그가 있음
+                //해결방법 : 해당 이벤트 객체를 변수로 옮겨담으면서 직접 type 지정
+                const eventTarget = e.currentTarget;
+                (_a = eventTarget.closest('li')) === null || _a === void 0 ? void 0 : _a.remove();
+            });
+        }
+        else {
+            item.style.textDecoration = 'none';
+            (_a = item.querySelector('button')) === null || _a === void 0 ? void 0 : _a.remove();
+        }
+        saveTasks();
+    });
+    item.prepend(checkbox, task.title);
+    list === null || list === void 0 ? void 0 : list.append(item);
 }
-
 function saveTasks() {
-	localStorage.setItem('TASKS', JSON.stringify(tasks));
+    localStorage.setItem('TASKS', JSON.stringify(tasks));
 }

@@ -1,6 +1,7 @@
 interface Task {
 	id: number;
-	title: string;
+	//title에 들어가는 값 자체가 DOM을 통해서 가져오는 문자열이기 때문에 undefined로 union타입 지정
+	title: string | undefined;
 	createAt: Date;
 	complete: boolean;
 }
@@ -13,6 +14,27 @@ const input = document.querySelector<HTMLInputElement>('#title');
 //Task 방식의 배열타입을 tasks에 지정
 let tasks: Task[] = JSON.parse(localStorage.getItem('TASKS') || '[]');
 tasks.forEach(task => addListItem(task));
+
+//DOM이 담겨있는 변수의 경우는 담겨있는 값 자체가 web api를 통해서 가져오는 값이기 때문에
+//JS 자체적으로 제어권이 없으므로 항상 값이 null일 수 있는걸 인지하고 있기 때문에 optioanal chaining처리
+form?.addEventListener('submit', e => {
+	e.preventDefault();
+	if (input?.value.trim() === '') return alert('할일을 입력하세요.');
+	const newTask = {
+		id: performance.now(),
+		title: input?.value,
+		createAt: new Date(),
+		complete: false
+	};
+
+	tasks.push(newTask);
+	addListItem(newTask);
+	saveTasks();
+
+	//좌항에 옵셔널 체이닝 처리 불가능하므로 대입하는 연산문 자체를 괄호로 묶어서 표현식으로 만든다음
+	//input에 값이 있을 때에만 동작하도록 처리
+	input && (input.value = '');
+});
 
 function addListItem(task: Task): void {
 	const item = document.createElement('li');

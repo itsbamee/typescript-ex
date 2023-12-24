@@ -4,7 +4,6 @@ const input = document.querySelector('#title');
 let data = localStorage.getItem('TASKS');
 
 let tasks = data ? JSON.parse(data) : [];
-
 tasks.forEach(task => addListItem(task));
 
 form.addEventListener('submit', e => {
